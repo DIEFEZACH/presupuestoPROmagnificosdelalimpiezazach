@@ -1,4 +1,4 @@
-import React from "react";
+
 import type { FormState } from "../../lib/types";
 
 type Props = {

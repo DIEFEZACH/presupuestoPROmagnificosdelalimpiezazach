@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import CardSection from "../CardSection";
 import type { FormState } from "../../lib/types";
 import { SERVICE_CATALOG } from "../../lib/servicesCatalog";
 
 type SelectedMap = Record<string, number>; // id -> qty
+type SelectedRow = { id: string; qty: number; label: string; tag?: string };
 
 export default function Servicios({
   value,
@@ -15,22 +16,24 @@ export default function Servicios({
   const selected: SelectedMap = (value as any).selectedServices ?? {};
 
   const setQty = (id: string, qty: number) => {
-    const next = { ...selected };
+    const next: SelectedMap = { ...selected };
     if (qty <= 0) delete next[id];
     else next[id] = qty;
-    onChange({ ...(value as any), selectedServices: next } as any);
+
+    // ✅ Solo manda el patch, no todo value
+    onChange({ selectedServices: next } as any);
   };
 
   const toggle = (id: string) => setQty(id, selected[id] ? 0 : 1);
 
-  const selectedList = useMemo(() => {
+  const selectedList: SelectedRow[] = useMemo(() => {
     const all = SERVICE_CATALOG.flatMap((c) => c.items);
     return Object.entries(selected)
       .map(([id, qty]) => {
         const item = all.find((x) => x.id === id);
-        return item ? { id, qty, label: item.label, tag: item.tag } : null;
+        return item ? ({ id, qty, label: item.label, tag: item.tag } as SelectedRow) : null;
       })
-      .filter(Boolean) as { id: string; qty: number; label: string; tag?: string }[];
+      .filter((x): x is SelectedRow => Boolean(x));
   }, [selected]);
 
   return (
@@ -75,7 +78,12 @@ export default function Servicios({
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="text-sm font-extrabold">{it.label}</div>
-                        <div className={"mt-1 text-xs font-bold " + (active ? "text-white/85" : "text-slate-500")}>
+                        <div
+                          className={
+                            "mt-1 text-xs font-bold " +
+                            (active ? "text-white/85" : "text-slate-500")
+                          }
+                        >
                           {it.tag ? `Unidad: ${it.tag}` : "Servicio incluido"}
                         </div>
                       </div>
@@ -134,52 +142,57 @@ export default function Servicios({
           </div>
 
           {selectedList.length === 0 ? (
-            <div className="text-sm font-semibold text-slate-500">Ningún servicio seleccionado…</div>
+            <div className="text-sm font-semibold text-slate-500">
+              Ningún servicio seleccionado…
+            </div>
           ) : (
             <ul className="text-sm font-semibold text-slate-700 space-y-1">
               {selectedList.map((s) => (
                 <li key={s.id} className="flex items-center justify-between gap-3">
-                  <span>
+                  <span className="min-w-0">
                     {s.label} <span className="text-slate-400">x{s.qty}</span>
                   </span>
-                  <span className="text-xs font-bold text-slate-500">{s.tag ?? ""}</span>
+                  <span className="text-xs font-bold text-slate-500 whitespace-nowrap">
+                    {s.tag ?? ""}
+                  </span>
                 </li>
               ))}
             </ul>
           )}
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-3 items-start">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-3 items-start">
             <div>
-                <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide mb-2">
+              <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide mb-2">
                 Precio total del paquete (manual)
-                </div>
+              </div>
 
-                <input
+              <input
                 type="number"
                 min={0}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
+                inputMode="numeric"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
                 value={value.servicesTotal ?? 0}
                 onChange={(e) => onChange({ servicesTotal: Number(e.target.value) })}
                 placeholder="Ej. 1800"
-                />
+              />
 
-                <div className="mt-2 text-xs font-semibold text-slate-500">
+              <div className="mt-2 text-xs font-semibold text-slate-500">
                 Tip: aquí aplicas variación por región, material, condición, etc.
-                </div>
+              </div>
             </div>
 
             <div>
-                <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide mb-2">
+              <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide mb-2">
                 Total servicios
-                </div>
+              </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right">
+              <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right">
                 <div className="text-lg font-black text-brand-800">
-                    {money(value.servicesTotal || 0)}
+                  {money(value.servicesTotal || 0)}
                 </div>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
       </div>
     </CardSection>

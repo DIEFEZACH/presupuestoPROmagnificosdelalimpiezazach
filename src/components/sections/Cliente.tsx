@@ -1,4 +1,4 @@
-import React from "react";
+
 import CardSection from "../CardSection";
 import type { FormState } from "../../lib/types";
 

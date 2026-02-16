@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import Header from "./components/Header";
 import { useLocalStorageState } from "./lib/useLocalStorageState";
 import type { FormState } from "./lib/types";

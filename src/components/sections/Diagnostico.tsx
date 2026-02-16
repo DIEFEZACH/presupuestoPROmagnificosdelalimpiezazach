@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import CardSection from "../CardSection";
 import type { Delicacy, FormState, SizeTier, Soil } from "../../lib/types";
 
