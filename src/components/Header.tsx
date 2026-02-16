@@ -5,57 +5,77 @@ type Props = {
 };
 
 export default function Header({ logoDataUrl, onLogoChange }: Props) {
-  function onPickLogo(file: File | null) {
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => onLogoChange(String(reader.result));
-    reader.readAsDataURL(file);
-  }
-
   return (
-    <header className="mx-auto max-w-6xl px-5 pt-8">
-      <div className="rounded-2xl shadow-soft overflow-hidden border border-slate-100 bg-gradient-to-r from-brand-800 to-brand-400">
-        <div className="px-6 py-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center overflow-hidden">
-              {logoDataUrl ? (
-                <img src={logoDataUrl} alt="Logo" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-white font-black text-xl">M</span>
-              )}
-            </div>
+    <header className="bg-brand-50">
+      {/* safe-area para iPhone notch */}
+      <div className="pt-[env(safe-area-inset-top)]" />
 
-            <div>
-              <div className="text-white text-2xl font-black tracking-tight">PRESUPUESTO PRO</div>
-              <div className="text-white/80 text-sm font-semibold">Lavado de tapicería y alfombras</div>
+      <div className="mx-auto max-w-6xl px-4 sm:px-5 py-5">
+        <div className="rounded-3xl bg-gradient-to-r from-indigo-900 via-indigo-700 to-sky-500 text-white shadow-soft overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {/* Izquierda: logo + textos */}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden shrink-0">
+                  {logoDataUrl ? (
+                    <img src={logoDataUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                  ) : (
+                    <span className="text-xl font-black">M</span>
+                  )}
+                </div>
+
+                <div className="min-w-0">
+                  <div className="text-xl sm:text-2xl font-black leading-tight">
+                    PRESUPUESTO PRO
+                  </div>
+                  <div className="text-sm sm:text-base font-semibold text-white/85 truncate">
+                    Lavado de tapicería y alfombras
+                  </div>
+                </div>
+              </div>
+
+              {/* Derecha: botón + fecha/hora */}
+              <div className="flex sm:flex-col sm:items-end gap-3 sm:gap-2">
+                <label className="inline-flex">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = () => onLogoChange(String(reader.result));
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+
+                  {/* Botón: compacto en móvil */}
+                  <span className="cursor-pointer select-none rounded-2xl bg-white/12 hover:bg-white/18 border border-white/20 px-4 py-3 sm:px-5 sm:py-3 font-extrabold text-sm sm:text-base">
+                    Subir logo
+                  </span>
+                </label>
+
+                {/* Fecha/hora: NO se sale en móvil */}
+                <div className="text-right leading-tight max-w-[46vw] sm:max-w-none">
+                  <div className="text-[11px] sm:text-xs font-bold text-white/85 truncate">
+                    {new Date().toLocaleDateString("es-MX", {
+                      weekday: "long",
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </div>
+                  <div className="text-sm sm:text-base font-black truncate">
+                    {new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => onPickLogo(e.target.files?.[0] ?? null)}
-              />
-              <div className="rounded-xl bg-white/15 border border-white/25 px-4 py-3 text-white font-black hover:bg-white/20">
-                Subir logo
-              </div>
-            </label>
-
-            <div className="text-right text-white/80 text-xs font-semibold">
-              {new Date().toLocaleString("es-MX", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-              <div className="text-white font-black text-base">
-                {new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
-              </div>
-            </div>
-          </div>
+          {/* opcional: línea inferior estética */}
+          <div className="h-1 bg-white/10" />
         </div>
       </div>
     </header>

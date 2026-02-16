@@ -86,7 +86,7 @@ export default function App() {
         onLogoChange={(logoDataUrl) => setForm({ ...form, logoDataUrl })}
       />
 
-      <main className="mx-auto max-w-6xl px-5 py-8 space-y-6">
+      <main className="mx-auto max-w-6xl px-4 sm:px-5 py-6 sm:py-8 space-y-6">
         <div className="space-y-6">
           <Profesionales value={form} onChange={(patch) => setForm({ ...form, ...patch })} />
           <Cliente value={form} onChange={(patch) => setForm({ ...form, ...patch })} />
