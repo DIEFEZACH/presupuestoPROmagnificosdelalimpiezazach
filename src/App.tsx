@@ -5,6 +5,7 @@ import type { FormState } from "./lib/types";
 import { mxn } from "./lib/utils";
 import { exportNodeToPdf } from "./lib/pdf";
 import PdfResumen from "./components/pdf/PdfResumen";
+import { normalizeUrl } from "./lib/normalizeUrl";
 
 import Profesionales from "./components/sections/Profesionales";
 import Cliente from "./components/sections/Cliente";
@@ -16,6 +17,8 @@ import Extras from "./components/sections/Extras";
 import Logistica from "./components/sections/Logistica";
 
 const initialState: FormState = {
+  docType: "Presupuesto",
+
   company: "",
   tech: "",
   phone: "",
@@ -25,6 +28,7 @@ const initialState: FormState = {
   clientPhone: "",
   clientEmail: "",
   address: "",
+  addressMapUrl: "",
 
   mainType: "",
   material: "",
@@ -84,6 +88,8 @@ export default function App() {
       <Header
         logoDataUrl={form.logoDataUrl}
         onLogoChange={(logoDataUrl) => setForm({ ...form, logoDataUrl })}
+        docType={form.docType}
+        onDocTypeChange={(docType) => setForm({ ...form, docType })}
       />
 
       <main className="mx-auto max-w-6xl px-4 sm:px-5 py-6 sm:py-8 space-y-6">
@@ -142,7 +148,9 @@ export default function App() {
                         min={0}
                         className="w-full rounded-2xl bg-white/15 border border-white/25 px-4 py-3 font-black text-white outline-none focus:ring-4 focus:ring-white/20"
                         value={form.deposit || 0}
-                        onChange={(e) => setForm({ ...form, deposit: Number(e.target.value) })}
+                        onChange={(e) =>
+                          setForm({ ...form, deposit: Number(e.target.value) })
+                        }
                         placeholder="0"
                       />
                     </div>
@@ -167,10 +175,16 @@ export default function App() {
                   className="flex-1 rounded-2xl bg-brand-600 text-white font-extrabold px-5 py-4 shadow-soft hover:bg-brand-800 transition"
                   onClick={async () => {
                     if (!pdfRef.current) return;
-                    await exportNodeToPdf(pdfRef.current, "Presupuesto_cliente.pdf");
+
+                    const fileName = `${form.docType.replaceAll(" ", "_")}_cliente.pdf`;
+                    const mapUrl = normalizeUrl(form.addressMapUrl);
+
+                    const linkMap = mapUrl ? { map: mapUrl } : undefined;
+
+                    await exportNodeToPdf(pdfRef.current, fileName, {}, linkMap);
                   }}
                 >
-                  Generar presupuesto
+                  Generar {form.docType.toLowerCase()}
                 </button>
 
                 <button
@@ -199,11 +213,18 @@ export default function App() {
           </section>
         </div>
       </main>
-    <div style={{ position: "fixed", left: -99999, top: 0 }}>
-      <div ref={pdfRef} className="w-[794px] bg-white">
-        <PdfResumen form={form} servicesTotal={servicesManualTotal} extrasTotal={extrasTotal} />
+
+      {/* Nodo oculto para render del PDF */}
+      <div style={{ position: "fixed", left: -99999, top: 0 }}>
+        <div ref={pdfRef} className="w-[794px] bg-white">
+          <PdfResumen
+            form={form}
+            servicesTotal={servicesManualTotal}
+            extrasTotal={extrasTotal}
+            docType={form.docType}
+          />
+        </div>
       </div>
-    </div>
     </div>
   );
 }

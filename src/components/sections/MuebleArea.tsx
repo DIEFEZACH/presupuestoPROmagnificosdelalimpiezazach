@@ -1,23 +1,102 @@
-
 import CardSection from "../CardSection";
 import type { FormState, Urgency } from "../../lib/types";
 
 const MAIN_TYPES = [
-  "Sala en L (Escuadra)",
-  "Sala 3-2-1",
+  // ===== Salas (tela / piel)
+  "Sala 3-2-1 S/C",
+  "Sala 3-2-1 c/6 coj.",
+  "Sala en L (Esq.)",
   "Sala Modular",
-  "Sofá Cama",
-  "Sillón Individual",
-  "Sillón Reclinable",
-  "Sillas de Comedor",
-  "Colchón King Size",
+  "Plaza extra",
+  "Taburete",
+  "Futón",
+  "Sofá individual",
+  "Love seat",
+  "Sofá 3 personas",
+  "Sofá 4 personas",
+  "Sofá diván",
+  "Cojín deco",
+  "Cojín mediano",
+  "Cojín grande (asiento/respaldo)",
+  "Cojín gigante",
+  "Sofá cama individual",
+  "Sofá cama matrimonial",
+  "Sofá cama Queen Size",
+  "Sofá cama King Size",
+  "Sofá cama c/colchoneta",
+  "Cabecera individual",
+  "Cabecera matrimonial",
+  "Cabecera Queen Size",
+  "Cabecera King Size",
+
+  // ===== Colchones y accesorios
+  "Colchón cuna",
+  "Colchón individual",
+  "Colchón matrimonial",
   "Colchón Queen Size",
-  "Colchón Matrimonial",
-  "Colchón Individual",
-  "Alfombra (m2)",
-  "Tapete Decorativo",
-  "Interiores de Auto",
-  "Cortinas",
+  "Colchón King Size",
+  "Box spring individual",
+  "Box spring matrimonial",
+  "Box spring Queen/King",
+  "Carriola chica tijera",
+  "Carriola mediana",
+  "Carriola grande",
+  "Portabebé p/auto",
+  "Portabebé",
+
+  // ===== Sillas y sillones
+  "Sillas (solo asiento)",
+  "Sillas asiento y respaldo",
+  "Sillas forradas",
+  "Silla secretarial",
+  "Silla Bergère",
+  "Reposet sencillo",
+  "Reposet eléctrico",
+  "Sillón ejecutivo",
+
+  // ===== Telas
+  "Cortinas por hoja",
+  "Tela en muro",
+  "Mampara",
+  "Tapete pelo corto sintético",
+  "Tapete pelo largo sintético",
+  "Tapete pelo natural",
+
+  // ===== Autos y camionetas (tela / piel)
+  "Solo asientos (auto)",
+  "Asientos y alfombra (auto)",
+  "Auto completo",
+  "Camioneta 7p – solo asientos",
+  "Camioneta 7p – asientos y alfombra",
+  "Camioneta 7p – completa",
+  "Camioneta grande",
+
+  // ===== Pisos y superficies especiales
+  "Alfombra uso rudo (≤100 m²)",
+  "Alfombra uso rudo (>100 m²)",
+  "Alfombra residencial (≤100 m²)",
+  "Alfombra residencial (>100 m²)",
+  "Pulido de cubierta de mármol",
+  "Pulido de mosaico / vitropiso",
+  "Sólo aplicación de sello",
+  "Pulido y sello de mosaico",
+  "Pulido y encerado de mosaico",
+  "Pulido mármol/terrazo/granito (≤100 m²)",
+  "Pulido mármol/terrazo/granito (>100 m²)",
+  "Lavado de cemento (≤100 m²)",
+  "Oxidado de cemento (≤100 m²)",
+
+  // ===== Extras / Paquetes / Alcances
+  "Sanitización con nebulización (≤100 m²)",
+  "Renta de cuadrilla (8 h, 2 elementos, jarcería, químicos y maquinaria)",
+  "Hora adicional de cuadrilla",
+  "PAQUETE BÁSICO",
+  "PAQUETE GOLDEN",
+  "PAQUETE GOLDEN PREMIUM",
+  "LIMPIEZA PIEL",
+  "LIMPIEZA E HIDRATACIÓN PIEL",
+
+  // ===== Otros
   "Otro",
 ] as const;
 

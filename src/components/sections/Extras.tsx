@@ -1,4 +1,3 @@
-
 import CardSection from "../CardSection";
 import type { FormState } from "../../lib/types";
 
@@ -13,13 +12,11 @@ export default function Extras({
 }) {
   const extras: ExtraItem[] = (value as any).extras ?? [];
 
-  const setExtras = (next: ExtraItem[]) => onChange({ ...(value as any), extras: next } as any);
+  // ✅ Solo manda patch (no todo value)
+  const setExtras = (next: ExtraItem[]) => onChange({ extras: next } as any);
 
   const addRow = () => {
-    setExtras([
-      ...extras,
-      { id: crypto.randomUUID(), concept: "", qty: 1, unit: 0 },
-    ]);
+    setExtras([...extras, { id: crypto.randomUUID(), concept: "", qty: 1, unit: 0 }]);
   };
 
   const update = (id: string, patch: Partial<ExtraItem>) => {
@@ -28,7 +25,10 @@ export default function Extras({
 
   const remove = (id: string) => setExtras(extras.filter((x) => x.id !== id));
 
-  const total = extras.reduce((acc, x) => acc + (Number(x.qty) || 0) * (Number(x.unit) || 0), 0);
+  const total = extras.reduce(
+    (acc, x) => acc + (Number(x.qty) || 0) * (Number(x.unit) || 0),
+    0
+  );
 
   return (
     <CardSection
@@ -43,6 +43,7 @@ export default function Extras({
       }
     >
       <div className="space-y-3">
+        {/* Encabezados solo desktop */}
         <div className="hidden md:grid md:grid-cols-12 gap-3 text-xs font-extrabold text-slate-500 uppercase tracking-wide px-2">
           <div className="md:col-span-6">Concepto / producto</div>
           <div className="md:col-span-2">Cant.</div>
@@ -54,8 +55,17 @@ export default function Extras({
           const rowTotal = (Number(row.qty) || 0) * (Number(row.unit) || 0);
 
           return (
-            <div key={row.id} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center rounded-2xl border border-slate-200 bg-white p-3">
+            <div
+              key={row.id}
+              className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center rounded-2xl border border-slate-200 bg-white p-3"
+            >
+              {/* Concepto */}
               <div className="md:col-span-6">
+                {/* Labels SOLO en móvil para evitar confusión */}
+                <div className="md:hidden mb-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wide">
+                  Concepto / producto
+                </div>
+
                 <input
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
                   placeholder="Ej. Cargo piso extra (sin elevador)"
@@ -64,28 +74,55 @@ export default function Extras({
                 />
               </div>
 
+              {/* Cantidad */}
               <div className="md:col-span-2">
+                <div className="md:hidden mb-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wide">
+                  Cant.
+                </div>
+
                 <input
                   type="number"
                   min={1}
+                  inputMode="numeric"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
-                  value={row.qty}
-                  onChange={(e) => update(row.id, { qty: Number(e.target.value) })}
+                  value={row.qty === 0 ? "" : row.qty}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    // si el usuario borra el input, lo dejamos en 0 (para no romper cálculos)
+                    update(row.id, { qty: v === "" ? 0 : Number(v) });
+                  }}
                 />
               </div>
 
+              {/* Costo u. */}
               <div className="md:col-span-2">
+                <div className="md:hidden mb-2 text-[11px] font-extrabold text-slate-500 uppercase tracking-wide">
+                  Costo u.
+                </div>
+
                 <input
                   type="number"
                   min={0}
+                  inputMode="decimal"
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
-                  value={row.unit}
-                  onChange={(e) => update(row.id, { unit: Number(e.target.value) })}
+                  // ✅ quita el 0 visual al escribir / cuando es 0
+                  value={row.unit === 0 ? "" : row.unit}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    update(row.id, { unit: v === "" ? 0 : Number(v) });
+                  }}
+                  placeholder="0"
                 />
               </div>
 
+              {/* Total + borrar */}
               <div className="md:col-span-2 flex items-center justify-between gap-3">
+                <div className="md:hidden text-[11px] font-extrabold text-slate-500 uppercase tracking-wide">
+                  Total
+                </div>
+
                 <div className="font-black text-slate-800">{money(rowTotal)}</div>
+
                 <button
                   type="button"
                   onClick={() => remove(row.id)}

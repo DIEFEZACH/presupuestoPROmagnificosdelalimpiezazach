@@ -1,5 +1,5 @@
-
-import type { FormState } from "../../lib/types";
+import type { ReactNode } from "react";
+import type { FormState, DocType } from "../../lib/types";
 import { mxn } from "../../lib/utils";
 import { SERVICES } from "../../lib/services";
 
@@ -7,10 +7,12 @@ export default function PdfResumen({
   form,
   servicesTotal,
   extrasTotal,
+  docType,
 }: {
   form: FormState;
   servicesTotal: number;
   extrasTotal: number;
+  docType: DocType;
 }) {
   const selected = SERVICES.filter((s) => (form.selectedServices?.[s.id] ?? 0) > 0);
 
@@ -21,8 +23,17 @@ export default function PdfResumen({
   const fecha = new Date();
   const fechaTxt = fecha.toLocaleDateString("es-MX");
   const horaTxt = fecha.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+  
+  const timePretty = form.time
+  ? new Date(`1970-01-01T${form.time}:00`).toLocaleTimeString("es-MX", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+  : "--";
 
   return (
+
     <div
       id="pdf-root"
       style={{
@@ -30,27 +41,41 @@ export default function PdfResumen({
         minHeight: "1123px",
         background: "#fff",
         padding: "34px",
+        boxSizing: "border-box",
         fontFamily:
           'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial',
       }}
     >
-      {/* Header */}
+      {/* Header (refleja el de la app) */}
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {form.logoDataUrl ? (
             <img
               src={form.logoDataUrl}
               alt="logo"
-              style={{ width: 62, height: 62, borderRadius: 14, objectFit: "cover" }}
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 14,
+                objectFit: "contain",
+                padding: 8,
+                background: "rgba(255,255,255,0.14)",
+                border: "1px solid rgba(255,255,255,0.22)",
+              }}
             />
           ) : (
-            <div style={{ width: 62, height: 62, borderRadius: 14, background: "#EEF2FF" }} />
+            <div
+              style={{
+                width: 62,
+                height: 62,
+                borderRadius: 14,
+                background: "#EEF2FF",
+              }}
+            />
           )}
 
           <div>
-            <div style={{ fontSize: 26, fontWeight: 900, color: "#1f2a44" }}>
-              PRESUPUESTO PRO
-            </div>
+            <div style={{ fontSize: 26, fontWeight: 900, color: "#1f2a44" }}>{docType}</div>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#5b6b85" }}>
               Lavado de tapicería y alfombras
             </div>
@@ -65,13 +90,41 @@ export default function PdfResumen({
 
       <div style={{ height: 6, background: "#2b7fff", borderRadius: 999, marginTop: 18 }} />
 
+      {/* ✅ DATOS PROFESIONALES (antes no estaba, por eso no se imprimía) */}
+      <div style={{ marginTop: 16 }}>
+        <Card title="DATOS PROFESIONALES">
+          <Line label="Empresa / Servicio" value={form.company || "No especificado"} />
+          <Line label="Técnico responsable" value={form.tech || "No especificado"} />
+          <Line label="Teléfono de contacto" value={form.phone || "--"} />
+          <Line label="Zona de cobertura" value={form.coverage || "--"} />
+        </Card>
+      </div>
+
       {/* 2 cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 18 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
+
         <Card title="DATOS DEL CLIENTE">
-          <Line label="Nombre" value={form.clientName || "No especificado"} />
-          <Line label="WhatsApp" value={form.clientPhone || "--"} />
-          <Line label="Email" value={form.clientEmail || "--"} />
-          <Line label="Domicilio" value={form.address || "--"} />
+        {/* ...dentro del Card DATOS DEL CLIENTE */}
+        <Line label="Día del servicio" value={form.date || "--"} />
+        <Line label="Horario" value={timePretty} />
+        <Line label="Nombre" value={form.clientName || "No especificado"} />
+        <Line label="WhatsApp" value={form.clientPhone || "--"} />
+        <Line label="Email" value={form.clientEmail || "--"} />
+        <Line label="Domicilio" value={form.address || "--"} />
+
+        <div style={{ fontSize: 12.5, color: "#0f172a" }}>
+          <span style={{ fontWeight: 900 }}>Mapa:</span>{" "}
+          {form.addressMapUrl?.trim() ? (
+            <span
+              data-pdf-link="map"
+              style={{ fontWeight: 800, color: "#2563EB", textDecoration: "underline" }}
+            >
+              Ver ubicación en Google Maps
+            </span>
+          ) : (
+            <span style={{ fontWeight: 600 }}>--</span>
+          )}
+        </div>
         </Card>
 
         <Card title="DETALLES DEL SERVICIO">
@@ -97,7 +150,9 @@ export default function PdfResumen({
             <Line
               label="Manchas/Condiciones"
               value={
-                form.conditions?.length ? form.conditions.join(", ") : "Ninguno / No especificado"
+                form.conditions?.length
+                  ? form.conditions.join(", ")
+                  : "Ninguno / No especificado"
               }
             />
           </div>
@@ -144,6 +199,7 @@ export default function PdfResumen({
                       color: "white",
                       fontSize: 12,
                       fontWeight: 900,
+                      flex: "0 0 auto",
                     }}
                   >
                     ✓
@@ -199,7 +255,7 @@ export default function PdfResumen({
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div style={{ border: "1px solid #E2E8F0", borderRadius: 16, padding: 16, background: "#fff" }}>
       <div style={{ fontSize: 13, fontWeight: 900, color: "#0f172a", marginBottom: 10 }}>
@@ -213,7 +269,8 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function Line({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ fontSize: 12.5, color: "#0f172a" }}>
-      <span style={{ fontWeight: 900 }}>{label}:</span> <span style={{ fontWeight: 600 }}>{value}</span>
+      <span style={{ fontWeight: 900 }}>{label}:</span>{" "}
+      <span style={{ fontWeight: 600 }}>{value}</span>
     </div>
   );
 }

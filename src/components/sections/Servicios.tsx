@@ -4,6 +4,11 @@ import type { FormState } from "../../lib/types";
 import { SERVICE_CATALOG } from "../../lib/servicesCatalog";
 
 type SelectedMap = Record<string, number>; // id -> qty
+
+// Tipos para el catálogo (quita readonly / unknown)
+type CatalogItem = { id: string; label: string; tag?: string };
+type CatalogCategory = { id: string; title: string; items: CatalogItem[] };
+
 type SelectedRow = { id: string; qty: number; label: string; tag?: string };
 
 export default function Servicios({
@@ -27,14 +32,23 @@ export default function Servicios({
   const toggle = (id: string) => setQty(id, selected[id] ? 0 : 1);
 
   const selectedList: SelectedRow[] = useMemo(() => {
-    const all = SERVICE_CATALOG.flatMap((c) => c.items);
-    return Object.entries(selected)
+    // ✅ casteamos el catálogo para evitar readonly/unknown
+    const catalog = SERVICE_CATALOG as unknown as CatalogCategory[];
+    const all: CatalogItem[] = catalog.flatMap((c) => c.items);
+
+    // ✅ tipamos Object.entries para que qty sea number
+    const entries = Object.entries(selected) as Array<[string, number]>;
+
+    return entries
       .map(([id, qty]) => {
-        const item = all.find((x) => x.id === id);
+        const item = all.find((x: CatalogItem) => x.id === id);
         return item ? ({ id, qty, label: item.label, tag: item.tag } as SelectedRow) : null;
       })
       .filter((x): x is SelectedRow => Boolean(x));
   }, [selected]);
+
+  // ✅ igual casteo para que TS no se queje en map
+  const catalog = SERVICE_CATALOG as unknown as CatalogCategory[];
 
   return (
     <CardSection
@@ -44,14 +58,12 @@ export default function Servicios({
       right={
         <div className="text-right">
           <div className="text-xs font-bold text-slate-500">Servicios</div>
-          <div className="text-base font-black text-brand-800">
-            {money(value.servicesTotal || 0)}
-          </div>
+          <div className="text-base font-black text-brand-800">{money(value.servicesTotal || 0)}</div>
         </div>
       }
     >
       <div className="space-y-6">
-        {SERVICE_CATALOG.map((cat) => (
+        {catalog.map((cat) => (
           <div key={cat.id}>
             <div className="flex items-center gap-2 mb-3">
               <div className="text-sm font-extrabold text-slate-800">{cat.title}</div>
@@ -80,8 +92,7 @@ export default function Servicios({
                         <div className="text-sm font-extrabold">{it.label}</div>
                         <div
                           className={
-                            "mt-1 text-xs font-bold " +
-                            (active ? "text-white/85" : "text-slate-500")
+                            "mt-1 text-xs font-bold " + (active ? "text-white/85" : "text-slate-500")
                           }
                         >
                           {it.tag ? `Unidad: ${it.tag}` : "Servicio incluido"}
@@ -142,9 +153,7 @@ export default function Servicios({
           </div>
 
           {selectedList.length === 0 ? (
-            <div className="text-sm font-semibold text-slate-500">
-              Ningún servicio seleccionado…
-            </div>
+            <div className="text-sm font-semibold text-slate-500">Ningún servicio seleccionado…</div>
           ) : (
             <ul className="text-sm font-semibold text-slate-700 space-y-1">
               {selectedList.map((s) => (
@@ -171,7 +180,7 @@ export default function Servicios({
                 min={0}
                 inputMode="numeric"
                 className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-400"
-                value={value.servicesTotal ?? 0}
+                value={value.servicesTotal === 0 ? "" : value.servicesTotal}
                 onChange={(e) => onChange({ servicesTotal: Number(e.target.value) })}
                 placeholder="Ej. 1800"
               />

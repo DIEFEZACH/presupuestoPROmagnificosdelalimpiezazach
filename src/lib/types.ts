@@ -4,10 +4,14 @@ export type Delicacy = "Delicada" | "Estándar" | "Muy delicada";
 export type SizeTier = "Chico" | "Mediano" | "Grande";
 
 export type ServiceCategory =
-  | "Salas y sillones"
-  | "Colchones y dormitorio"
-  | "Sillas, tapetes y alfombras"
-  | "Tratamientos y adicionales";
+  | "Salas (tela/piel)"
+  | "Colchones y accesorios"
+  | "Sillas y sillones"
+  | "Telas"
+  | "Autos y camionetas (tela/piel)"
+  | "Pisos y superficies especiales"
+  | "Extras"
+  | "Paquetes y alcances";
 
 export type ServiceItem = {
   id: string;
@@ -18,7 +22,12 @@ export type ServiceItem = {
 
 export type ExtraItem = { id: string; concept: string; qty: number; unit: number };
 
+export type DocType = "Nota" | "Presupuesto" | "Orden de servicio";
+
 export type FormState = {
+  //Header
+  docType: DocType;
+
   // Profesionales
   company: string;
   tech: string;
@@ -30,6 +39,7 @@ export type FormState = {
   clientPhone: string;
   clientEmail: string;
   address: string;
+  addressMapUrl: string;
 
   // Mueble / Área
   mainType: string;

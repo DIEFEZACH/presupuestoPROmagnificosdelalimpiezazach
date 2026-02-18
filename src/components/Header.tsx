@@ -1,10 +1,19 @@
+import type { DocType } from "../lib/types";
 
 type Props = {
   logoDataUrl: string | null;
   onLogoChange: (dataUrl: string | null) => void;
+
+  docType: DocType;
+  onDocTypeChange: (t: DocType) => void;
 };
 
-export default function Header({ logoDataUrl, onLogoChange }: Props) {
+export default function Header({
+  logoDataUrl,
+  onLogoChange,
+  docType,
+  onDocTypeChange,
+}: Props) {
   return (
     <header className="bg-brand-50">
       {/* safe-area para iPhone notch */}
@@ -18,17 +27,40 @@ export default function Header({ logoDataUrl, onLogoChange }: Props) {
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center overflow-hidden shrink-0">
                   {logoDataUrl ? (
-                    <img src={logoDataUrl} alt="Logo" className="w-full h-full object-contain p-2" />
+                    <img
+                      src={logoDataUrl}
+                      alt="Logo"
+                      className="w-full h-full object-contain p-2"
+                    />
                   ) : (
                     <span className="text-xl font-black">M</span>
                   )}
                 </div>
 
                 <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl font-black leading-tight">
-                    PRESUPUESTO PRO
+                  {/* Selector de tipo */}
+                  <div className="inline-flex rounded-2xl bg-white/10 border border-white/15 p-1 w-fit">
+                    {(["Nota", "Presupuesto", "Orden de servicio"] as const).map((t) => {
+                      const active = docType === t;
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => onDocTypeChange(t)}
+                          className={
+                            "px-3 py-2 rounded-xl text-sm font-extrabold transition " +
+                            (active
+                              ? "bg-white text-indigo-900 shadow-soft"
+                              : "text-white/90 hover:bg-white/10")
+                          }
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="text-sm sm:text-base font-semibold text-white/85 truncate">
+
+                  <div className="text-sm sm:text-base font-semibold text-white/85 truncate mt-2">
                     Lavado de tapicería y alfombras
                   </div>
                 </div>
@@ -67,7 +99,10 @@ export default function Header({ logoDataUrl, onLogoChange }: Props) {
                     })}
                   </div>
                   <div className="text-sm sm:text-base font-black truncate">
-                    {new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date().toLocaleTimeString("es-MX", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </div>
                 </div>
               </div>

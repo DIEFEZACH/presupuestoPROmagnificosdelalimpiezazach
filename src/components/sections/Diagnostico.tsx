@@ -86,17 +86,34 @@ function Choice({
       ? "bg-blue-100 text-blue-700"
       : "bg-emerald-100 text-emerald-700";
 
+  // ✅ Blindaje: si por localStorage llegó un valor extraño, lo corregimos
+  const safeValue = options.includes(value) ? value : options[0];
+
   return (
     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
       <div className="flex items-center justify-between mb-3">
-        <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide">{label}</div>
-        <div className={"text-xs font-black px-3 py-1 rounded-full " + badge}>{value}</div>
+        <div className="text-xs font-extrabold text-slate-600 uppercase tracking-wide">
+          {label}
+        </div>
+        <div className={"text-xs font-black px-3 py-1 rounded-full " + badge}>
+          {safeValue}
+        </div>
       </div>
 
       <select
-        className={"w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 " + ring}
-        value={value}
+        className={
+          "w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-semibold text-slate-800 outline-none focus:ring-4 " +
+          ring
+        }
+        value={safeValue}
         onChange={(e) => onChange(e.target.value)}
+        // ✅ iOS / mobile: evita “sugerencias” raras
+        autoCorrect="off"
+        autoCapitalize="none"
+        spellCheck={false}
+        inputMode="none"
+        data-lpignore="true"
+        aria-label={label}
       >
         {options.map((o) => (
           <option key={o} value={o}>
