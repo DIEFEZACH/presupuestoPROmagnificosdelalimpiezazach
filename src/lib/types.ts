@@ -69,6 +69,9 @@ extras: ExtraItem[];
   drying: string;
   notes: string;
 
+  beforePhoto: string | null;
+  afterPhoto: string | null;
+
   // Fin
   deposit: number;
 

@@ -52,6 +52,8 @@ const initialState: FormState = {
   duration: 2,
   drying: "4 a 6 horas (Natural)",
   notes: "",
+  beforePhoto: null,
+  afterPhoto: null,
 
   deposit: 0,
   logoDataUrl: null,

@@ -21,14 +21,14 @@ export async function exportNodeToPdf(
   const background = opts.background ?? "#ffffff";
 
   // 1) Captura en canvas
-  const canvas = await html2canvas(node, {
-    scale,
-    backgroundColor: background,
-    useCORS: true,
-    allowTaint: true,
-    logging: false,
-    windowWidth: node.scrollWidth,
-    windowHeight: node.scrollHeight,
+   const canvas = await html2canvas(node, {
+  scale,
+  backgroundColor: background,
+  useCORS: true,
+  allowTaint: true,
+  logging: false,
+  windowWidth: node.scrollWidth,
+  windowHeight: node.scrollHeight,
   });
 
   const imgData = canvas.toDataURL("image/png");
